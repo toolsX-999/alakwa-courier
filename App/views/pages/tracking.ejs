@@ -1,0 +1,178 @@
+<!-- HTML head-->
+<%- include('../partials/page-guard-head') %>
+<!-- HTML head ends here-->
+
+    <!-- Header starts here-->
+    <%- include('../partials/header') %>
+    <!-- Header ends here-->
+
+    <!-- Nav starts here -->
+    <%- include('../partials/nav') %> 
+    <!-- Nav ends here -->
+
+<!-- Tracking section starts here -->
+
+    <!-- Feedback messages -->
+    <% if (message && type==="Error" ) { %>
+    <div class="alert alert-warning alert-dismissible fade show mx-auto mt-4" role="alert" style="width: 70%; margin-bottom: 500px;">
+        <strong>
+            <%= type %>:
+        </strong>
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% } %>
+    <!-- Feedback messages end -->
+
+    <% if (!message && type !=="Error" ) { %>
+    <div class="tracking-container container my-5 pb-5 border">
+        <div class="tracking-caption row py-3 mb-4">
+            <div>
+                <strong>Shipment with tracking number: <%= shipment.trackingNum %></strong><br>
+                <b class="text-muted">Invoice#: </b><small class="text-muted"><%= shipment.invoiceNum %></small><br>
+                <b class="text-muted">Sender : </b><small class="text-muted"><%= shipment.sender %></small> <br>
+                <b class="text-muted">Receiver: </b><small class="text-muted"><%= shipment.receiver %></small> <br>
+                <!-- <p>Sender</p>: <small>James Wang</small>
+                <p>Receiver</p>: <small>Evelyn Tu</small> -->
+
+            </div>
+        </div>
+    
+        <!-- Top Info Section starts here -->
+        <div class="tracking-info-top row py-2 mb-3">
+            <!-- Col 1 starts here -->
+            <!-- Contain the shipment schema data -->
+            <div class="col-12 col-md-4 mb-4">
+                <p class="bg-success text-white d-inline-block px-2 py-1 rounded-pill">
+                    <i class="fas fa-check-circle me-1"></i> <%= shipment.status %>
+                </p>
+                <div class="d-flex align-items-center rounded">
+                    <p id="trackingNumber" class="m-0"><%= shipment.trackingNum %></p>
+                    <button onclick="copyToClipboard()" class="btn btn-light ms-2 position-relative">
+                        <i class="fas fa-copy"></i>
+                        <span id="copyMessage" class="position-absolute top-0 start-50 translate-middle badge bg-dark text-white d-none">
+                            Copied!
+                        </span>
+                    </button>
+                </div>
+            </div>
+            <!-- Col 1 ends here -->
+
+            <!-- Col 2 starts here -->
+            <div class="col-12 col-md-4 mb-4">
+                <div class="container">
+                    <div class="row mb-4">
+                        <div class="col-sm-3 d-flex align-items-center p-0 m-0">
+                            <img class="flag" src="https://flagcdn.com/32x24/<%= originCountryCode.toLowerCase() %>.png" 
+                                 alt="<%= originCountryCode %> flag" class="me-1">
+                            <!-- <small class="text-uppercase"><%= originCountryCode %></small> -->
+                        </div>
+                        <div class="col-sm-2 p-0 m-0"><i class="fas fa-arrow-alt-circle-right p-0"></i></div>
+
+                        <div class="col-sm-3 d-flex align-items-center p-0 m-0">
+                            <img class="flag" src="https://flagcdn.com/32x24/<%= destinationCountryCode.toLowerCase() %>.png" 
+                                 alt="<%= destinationCountryCode %> flag" class="me-1">
+                            <!-- <small class="text-uppercase"><%= destinationCountryCode %></small> -->
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 p-0">
+                            <small class="small-text d-inline-block px-0">
+                                <b>From:</b><br>
+                                <%= originCountry %> <span class="ms-0">-></span> <span class="ms-0"><%= destinationCountry %></span>
+                            </small>
+                            <small class="small-text"><% shipment.shippingDate.toLocaleString() %></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Col 2 ends here -->
+
+            <!-- Col 3 starts here -->
+            <div class="col-12 col-md-4 mb-4">
+                <small class="small-text text-success d-inline-block px-0 py-1">
+                    <i class="fas fa-check-circle me-0"></i>
+                    <%= shipment.status %> on <%= shipment.shippingDate.toLocaleString() %>
+                </small>
+                <small class="small-text d-inline-block px-0 pt-4">
+                    <b>Facility:</b><br> <%= shipment.facility %>
+                </small>
+            </div>
+            <!-- Col 3 ends here -->
+        </div>
+        <!-- Contain the shipment schema data end -->
+        <!-- Top Info Section ends here -->
+    
+        <!-- Bottom Info Section starts here -->
+        <!-- Contain the updateShipment schema data -->
+        <div class="tracking-info-bottom tracking-steps row mt-3 border-top">           
+            <!-- Shipment steps -->
+            <% if (Array.isArray(updatedShipment) && updatedShipment.length > 0) { %>
+                <% updatedShipment.forEach(update => { %>
+                    <div class="row step-row mb-4 py-3">
+                      <div class="col-12 col-md-4 stepper-column">
+                        <div class="tracking-marker"></div>
+                        <p class="small text-muted mb-1"><%= update.currentDate %></p>
+                        <p class="mb-0"><%= update.location %></p>
+                      </div>
+        
+                      <div class="bottom-text col-12 col-md-8 p-0 px-sm-2 mt-3 mt-sm-0">
+                        <h6 class="fw-bold">
+                            <% if (update.tag.toLowerCase() === 'delivered') { %>
+                                <h6 class="fw-bold"><i class="fas fa-check-circle me-1 text-success"></i><%= update.tag %></h6>
+                            <% } else { %>
+                                <%= update.tag %>
+                            <% } %>
+                        </h6>
+                        <p><%= update.statusMessage %></p>
+        
+                        <% if (update.notification) { %>
+                        <div>
+                            <a tabindex="0" class="btn btn-sm btn-danger popover-dismiss position-relative" role="button"
+                            data-bs-toggle="popover" data-bs-trigger="focus" title="Shipment stopped!" 
+                            data-bs-content="<%= update.notification %>">
+                            Urgent Attn Required
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                1+
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                          </a>
+                        </div>
+                        <script>
+                            var popover = new bootstrap.Popover(document.querySelector('.popover-dismiss'),{trigger: 'focus'})
+                        </script>
+                        <% } %>
+                      </div>
+                    </div>
+                <% }) %>
+            <% } %>
+          </div>
+        <!-- Shipment steps -->
+        </div>
+        <% } %>
+    <!-- Tracking section ends here -->
+
+    <!-- Tracking section script for clipboard copy feature starts here -->
+    <script>
+        function copyToClipboard() {
+            var text = document.getElementById("trackingNumber").innerText.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                let message = document.getElementById("copyMessage");
+                message.classList.remove("d-none");
+                setTimeout(() => {
+                    message.classList.add("d-none");
+                }, 2000);
+            }).catch(err => {
+                console.error("Error copying text: ", err);
+            });
+        }
+    </script>
+    <!-- Tracking section script for clipboard copy feature ends here -->
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %> 
+    <!-- Footer -->
+
+<!-- HTML tail-->
+<%- include('../partials/page-guard-tail') %>
+<!-- HTML tail ends here-->
