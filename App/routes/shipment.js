@@ -11,6 +11,9 @@ const {
 } = require("../controllers/shipment");
 const router = express.Router();
 
+router.get("/keepup", (req, res) => {
+    return res.status(200).json("Server is up and running");
+})
 // /shipment/create-shipment
 router.post("/create-shipment", createShipment);
 // /shipment/view-shipments
