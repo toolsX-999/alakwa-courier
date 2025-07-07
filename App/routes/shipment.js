@@ -26,6 +26,7 @@ router.post("/update_shipment/:shipmentId", updateShipment);
 
 router.put("/edit_shipment/:id", editShipment);
 router.delete("/delete_shipment/:id", deleteShipment);
+// router.get("/delete_shipment/:id", deleteShipment);
 router.get("/view_shipment/:id", viewShipment);
 // router.get("/view_shipments", viewShipments);
 // router.get("/view-users", viewUsers);

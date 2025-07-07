@@ -21,8 +21,8 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(methodOverRide());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverRide('_method'));
 app.use(session({
     secret: "my-secret-key123321",
     resave: false,

@@ -160,9 +160,9 @@ const countries = [
     { code: 'GB', name: 'United Kingdom' },
     { code: 'SG', name: 'Singapore' },
 ]
-   
+
 const getShipments = async (req, res) => {
-    const { activeTab, type, message="" } = req.query;
+    const { activeTab, type, message = "" } = req.query;
     try {
         const shipments = await Shipment.find();
         // console.log("In get shipment", shipments)
@@ -188,11 +188,11 @@ const getShipments = async (req, res) => {
     }
 }
 
-const createShipment = async(req, res) => {
-    const { 
+const createShipment = async (req, res) => {
+    const {
         trackingNum, title, sender, receiver, origin,
         destination, shippingDate, arrivalDate, weight, status, invoiceNum } = req.body;
-    
+
     if (!trackingNum || !title || !sender || !receiver || !origin || !destination ||
         !shippingDate || !arrivalDate || !weight || !status
     ) {
@@ -201,58 +201,58 @@ const createShipment = async(req, res) => {
             message: "Missing required fields!",
             type: "Error",
             activeTab: "contact-tab-pane",
-            shipments:[],
-            block: "createShipment",
-            countries
-        });
-    }
-    else {
-    try {
-        const existsShipment = await Shipment.findOne({trackingNum});
-        if (existsShipment) {
-            // console.log("Shipment with tracking number already exists");
-            return res.render("pages/user-dashboard/shipments", {
-                message: "Shipment with tracking number already exists",
-                type: "Error",
-                activeTab: "contact-tab-pane",
-                shipments:[],
-                block: "createShipment",
-                countries
-            });
-        }
-        await Shipment.create({
-            trackingNum,
-            title,
-            sender,
-            receiver,
-            origin,
-            destination,
-            shippingDate,
-            arrivalDate,
-            weight,
-            status,
-            invoiceNum
-        });
-        return res.redirect("/shipment/view-shipments?activeTab=contact-tab-pane&type=created");
-    } catch (error) {
-        // console.log("Error occured creating shipment in catch", error.message);
-        return res.render("pages/user-dashboard/shipments", {
-            message: "Error occured creating shipment",
-            type: "Error",
-            activeTab: "contact-tab-pane",
             shipments: [],
             block: "createShipment",
             countries
         });
     }
-}
+    else {
+        try {
+            const existsShipment = await Shipment.findOne({ trackingNum });
+            if (existsShipment) {
+                // console.log("Shipment with tracking number already exists");
+                return res.render("pages/user-dashboard/shipments", {
+                    message: "Shipment with tracking number already exists",
+                    type: "Error",
+                    activeTab: "contact-tab-pane",
+                    shipments: [],
+                    block: "createShipment",
+                    countries
+                });
+            }
+            await Shipment.create({
+                trackingNum,
+                title,
+                sender,
+                receiver,
+                origin,
+                destination,
+                shippingDate,
+                arrivalDate,
+                weight,
+                status,
+                invoiceNum
+            });
+            return res.redirect("/shipment/view-shipments?activeTab=contact-tab-pane&type=created");
+        } catch (error) {
+            // console.log("Error occured creating shipment in catch", error.message);
+            return res.render("pages/user-dashboard/shipments", {
+                message: "Error occured creating shipment",
+                type: "Error",
+                activeTab: "contact-tab-pane",
+                shipments: [],
+                block: "createShipment",
+                countries
+            });
+        }
+    }
 }
 
 // Track shipment with tracking number
 const trackShipment = async (req, res) => {
-    const { trackingNum, message="" } = req.query;
+    const { trackingNum, message = "" } = req.query;
     try {
-        const shipment = await Shipment.findOne({trackingNum});
+        const shipment = await Shipment.findOne({ trackingNum });
         if (!shipment) {
             return res.render("pages/tracking", {
                 message: "Invalid/No tracking number/id. Contact your agent for a valid tracking id",
@@ -260,9 +260,9 @@ const trackShipment = async (req, res) => {
             });
         }
         let originCountryCode, originCountry, destinationCountryCode, destinationCountry;
-        const updatedShipment = await UpdateShipment.find({shipmentId: shipment._id}).sort("-currentDate");
-            [originCountryCode, originCountry] = shipment.origin.split("|");
-            [destinationCountryCode, destinationCountry] = shipment.destination.split("|");
+        const updatedShipment = await UpdateShipment.find({ shipmentId: shipment._id }).sort("-currentDate");
+        [originCountryCode, originCountry] = shipment.origin.split("|");
+        [destinationCountryCode, destinationCountry] = shipment.destination.split("|");
         // console.log(originCountry, originCountryCode, destinationCountry, destinationCountryCode);
         return res.render("pages/tracking", {
             shipment,
@@ -292,7 +292,7 @@ const updateShipment = async (req, res) => {
         const shipment = await Shipment.findById(shipmentId);
         if (!shipment) {
             // console.log("No shipment found");
-            return res.render("pages/tracking",  {
+            return res.render("pages/tracking", {
                 message: "Tracking number does not exist!",
                 type: "Error",
                 activeTab: "profile-tab-pane",
@@ -311,7 +311,7 @@ const updateShipment = async (req, res) => {
         return res.redirect("/shipment/view-shipments?activeTab=profile-tab-pane&type=updated");
     } catch (error) {
         console.log("Error occured updating shipment");
-        return res.render("pages/tracking",  {
+        return res.render("pages/tracking", {
             message: "Internal server error",
             type: "Error",
             activeTab: "profile-tab-pane",
@@ -346,11 +346,11 @@ const updateShipment = async (req, res) => {
 //     } catch (error) {
 //         console.log("Error occured fetching updated shipments: ", error.message);
 //     }
-    
+
 // }
 
 
-const editShipment = async(req, res) => {
+const editShipment = async (req, res) => {
     const { firstName, lastName, countryOrigin, countryDest, status, trackingNum } = req.body;
     const { id } = req.params;
 
@@ -361,49 +361,53 @@ const editShipment = async(req, res) => {
             countryOrigin,
             countryDest,
             status,
-            trackingNum}, 
-            {new: true});
-        return res.status(200).json({success: true, data: updatedShipment});
-        } catch (error) {
-        return res.status(500).json({success: false, msg: "Error occured updating shipment"});        
+            trackingNum
+        },
+            { new: true });
+        return res.status(200).json({ success: true, data: updatedShipment });
+    } catch (error) {
+        return res.status(500).json({ success: false, msg: "Error occured updating shipment" });
     }
 }
 
-const deleteShipment = async(req, res) => {
+const deleteShipment = async (req, res) => {
     const { id } = req.params;
 
     try {
         const deletedShipment = await Shipment.findByIdAndDelete(id);
         if (!deletedShipment) {
-            return res.status(400).json({success: false, msg: "Shipment not found and could'nt be deleted"});
+            return res.status(400).json({ success: false, msg: "Shipment not found and could'nt be deleted" });
         }
-        return res.status(204).json({success: true, msg: "Shipment deleted"});
-        } catch (error) {
-        return res.status(500).json({success: false, msg: "Error occured deleting shipment"});        
+
+        const shipments = await Shipment.find();
+        // return res.redirect("/shipment/view-shipments?activeTab=profile-tab-pane&type=created");
+        return res.redirect("/shipment/view-shipments?activeTab=profile-tab-pane");
+    } catch (error) {
+        return res.status(500).json({ success: false, msg: "Error occured deleting shipment" });
     }
 }
 
-const viewShipment = async(req, res) => {
+const viewShipment = async (req, res) => {
     const { id } = req.params;
 
     try {
         const shipment = await Shipment.findById(id);
         if (!shipment)
-            return res.status(200).json({success: true, msg: "No shipment found"});
-        return res.status(200).json({success: true, data: shipment});
-        } catch (error) {
-        return res.status(500).json({success: false, msg: "Error occured viewing shipment"});        
+            return res.status(200).json({ success: true, msg: "No shipment found" });
+        return res.status(200).json({ success: true, data: shipment });
+    } catch (error) {
+        return res.status(500).json({ success: false, msg: "Error occured viewing shipment" });
     }
 }
 
-const viewShipments = async(req, res) => {
+const viewShipments = async (req, res) => {
     try {
         const shipment = await Shipment.find();
         if (!shipment)
-            return res.status(200).json({success: true, msg: "No shipment found"});
-        return res.status(200).json({success: true, data: shipment});
-        } catch (error) {
-        return res.status(500).json({success: false, msg: "Error occured viewing shipment"});        
+            return res.status(200).json({ success: true, msg: "No shipment found" });
+        return res.status(200).json({ success: true, data: shipment });
+    } catch (error) {
+        return res.status(500).json({ success: false, msg: "Error occured viewing shipment" });
     }
 }
 
